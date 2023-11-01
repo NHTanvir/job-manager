@@ -1,4 +1,5 @@
 <?php
+use WeDevs\ERP\CRM\Contact;
 /**
  * File containing the class WP_Job_Manager_Form_Submit_Job.
  *
@@ -217,6 +218,21 @@ class WP_Job_Manager_Form_Submit_Job extends WP_Job_Manager_Form {
 		} else {
 			$job_type = 'term-select';
 		}
+
+		$originalArray 	= [];
+		$newArray 		= [];
+		$args 			= [];
+		$args['type'] 	= 'company';
+		if( function_exists('erp_get_peoples') ) {
+			$originalArray 	= erp_get_peoples( $args );
+		}
+
+		if ( $originalArray ) {
+			foreach ($originalArray as $item) {
+				$newArray[$item->id] = $item->company;
+			}
+		}
+
 		$this->fields = apply_filters(
 			'submit_job_form_fields',
 			[
@@ -300,58 +316,13 @@ class WP_Job_Manager_Form_Submit_Job extends WP_Job_Manager_Form {
 					],
 				],
 				'company' => [
-					'company_name'    => [
+					'erp_company_id'     => [
 						'label'       => __( 'Company name', 'wp-job-manager' ),
-						'type'        => 'text',
+						'type'        => 'select',
+						'options'     => $newArray,
+						'description' => __( 'WP ERP company name', 'wp-job-manager' ),
 						'required'    => true,
-						'placeholder' => __( 'Enter the name of the company', 'wp-job-manager' ),
-						'priority'    => 1,
-					],
-					'company_website' => [
-						'label'       => __( 'Website', 'wp-job-manager' ),
-						'type'        => 'text',
-						'sanitizer'   => 'url',
-						'required'    => false,
-						'placeholder' => __( 'http://', 'wp-job-manager' ),
-						'priority'    => 2,
-					],
-					'company_tagline' => [
-						'label'       => __( 'Tagline', 'wp-job-manager' ),
-						'type'        => 'text',
-						'required'    => false,
-						'placeholder' => __( 'Briefly describe your company', 'wp-job-manager' ),
-						'maxlength'   => 64,
-						'priority'    => 3,
-					],
-					'company_video'   => [
-						'label'       => __( 'Video', 'wp-job-manager' ),
-						'type'        => 'text',
-						'sanitizer'   => 'url',
-						'required'    => false,
-						'placeholder' => __( 'A link to a video about your company', 'wp-job-manager' ),
-						'priority'    => 4,
-					],
-					'company_twitter' => [
-						'label'       => __( 'Twitter username', 'wp-job-manager' ),
-						'type'        => 'text',
-						'required'    => false,
-						'placeholder' => __( '@yourcompany', 'wp-job-manager' ),
-						'priority'    => 5,
-					],
-					'company_logo'    => [
-						'label'              => __( 'Logo', 'wp-job-manager' ),
-						'type'               => 'file',
-						'required'           => false,
-						'placeholder'        => '',
-						'priority'           => 6,
-						'ajax'               => true,
-						'multiple'           => false,
-						'allowed_mime_types' => [
-							'jpg'  => 'image/jpeg',
-							'jpeg' => 'image/jpeg',
-							'gif'  => 'image/gif',
-							'png'  => 'image/png',
-						],
+						'priority'    => 10,
 					],
 				],
 			]
