@@ -1,0 +1,44 @@
+.erp-job-container {
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.erp-job-container label {
+    display: block;
+    margin-top: 10px;
+}
+
+.erp-job-container input[type="text"],
+.erp-job-container input[type="email"],
+.erp-job-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.erp-job-container input[type="file"] {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.erp-job-container textarea {
+    height: 100px;
+}
+
+.erp-job-container .btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 15px 50px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.erp-job-container .btn:hover {
+    background-color: #0056b3;
+}

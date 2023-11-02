@@ -20,17 +20,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	?>
 	<div class="job_application application">
 		<?php do_action( 'job_application_start', $apply ); ?>
+		<?php if( is_user_logged_in() ) : ?>
+	    <div class="erp-job-container">
+	        <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data">
+	            <label for="full_name">Full Name:</label>
+	            <input type="text" id="full_name" name="full_name" required>
 
-		<input type="button" class="application_button button" value="<?php esc_attr_e( 'Apply for job', 'wp-job-manager' ); ?>" />
+	            <label for="email">Email:</label>
+	            <input type="email" id="email" name="email" required>
 
-		<div class="application_details">
-			<?php
-				/**
-				 * job_manager_application_details_email or job_manager_application_details_url hook
-				 */
-				do_action( 'job_manager_application_details_' . $apply->type, $apply );
-			?>
-		</div>
+	            <label for="message">Message:</label>
+	            <textarea id="message" name="message" required></textarea>
+
+	            <label for="cv">Upload CV:</label>
+	            <input type="file" id="cv" name = "files[]"  accept=".pdf, .doc, .docx">
+
+	            <input type="submit" value="Apply" class="btn erp-job-submit-btn">
+	        </form>
+	    </div>
+	    <?php else: ?>
+	    <?php _e( 'Log In to apply', 'wp-job-manager' ) ?>
+	    <?php endif; ?>
 		<?php do_action( 'job_application_end', $apply ); ?>
 	</div>
 <?php endif; ?>
