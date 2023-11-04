@@ -32,7 +32,7 @@ jQuery(document).ready(function ($) {
 
                     if( cxc_response != '' && cxc_response.success ){
                         $('.cxc_upload_form')[0].reset();
-                        alert('successfully uploaded an image');
+                        $('.erp-job-success').text('Successfully Applied');
                     }
                     else{
                         alert('CV not uploaded');

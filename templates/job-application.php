@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<label for="cv">Upload CV:</label>
 				<input type="file" name="file"  accept=".pdf, .doc, .doc" required />
 				<input type="hidden" name="post_id" id="post_id" value="<?php echo get_the_id() ?>" />
-
+				<div class="erp-job-success"></div>
 	            <input type="submit" value="Apply" class="btn erp-job-submit-btn">
 	        </form>
 	    </div>

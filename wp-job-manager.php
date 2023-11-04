@@ -81,6 +81,7 @@ function activate_my_plugin() {
         message text NOT NULL,
         cv_url text NOT NULL,
         company_id mediumint(9) NOT NULL,
+        contract_id mediumint(9) NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";
 
@@ -115,12 +116,24 @@ function cxc_upload_file_data(){
         $message        = sanitize_text_field( $_POST['message'] );
         $post_id        = sanitize_text_field( $_POST['post_id'] );
         $company_id     = get_post_meta( $post_id, '_erp_company_id', true );
+        $contact_id     = 0;
+
         if( !empty( $cxc_success ) ) {
             global $wpdb;
             $table_name     = $wpdb->prefix . 'aa_erp_job_list';
             // $email_exists   = $wpdb->get_var(
             //     $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE email = %s", $email)
             // );
+
+            $data = [
+                'type'          => 'contact',
+                'first_name'    => $full_name,
+                'email'         => $email,
+                'life_stage'    => 'applied',
+            ];
+            if ( function_exists('erp_insert_people') ) {
+                $contact_id = erp_insert_people( $data );
+            }
 
             $wpdb->insert(
                 $table_name,
@@ -130,8 +143,15 @@ function cxc_upload_file_data(){
                     'message'       => $message,
                     'cv_url'        => $cxc_image_url,
                     'company_id'    => $company_id,
+                    'contract_id'    => $contact_id,
                 )
             );
+            $admin_email    = get_option('admin_email');
+            $subject        = 'New Job Application Submitted';
+            $message        = "A new job application has been submitted with {$email}. Please check the admin panel for details.";
+
+            wp_mail( $admin_email, $subject, $message );
+
             $cxc_success = true;
         }
         else{
