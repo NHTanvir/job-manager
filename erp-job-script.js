@@ -1,29 +1,47 @@
 jQuery(document).ready(function ($) {
-    $('.erp-job-submit-btn').on('click', function (e) {
+    $(document).on('click', '.erp-job-submit-btn', function(e){
         e.preventDefault();
 
-        var fd              = new FormData();
-        var file            = jQuery(document).find('input[type="file"]');
-        var caption         = jQuery(this).find('input[name=img_caption]');
-        var individual_file = file[0].files[0];
-        fd.append("file", individual_file);
-        var individual_capt = caption.val();
-        fd.append("caption", individual_capt);  
-        fd.append('action', 'epr_job_submit');  
+        var cxc_form = new FormData();
+        var file = $(document).find('input[type="file"]');
+        var cxc_individual_file = file[0].files[0];
 
-        jQuery.ajax({
-            type: 'POST',
-            url: ERPJOB.ajaxurl,
-            data: fd,
-            contentType: false,
-            processData: false,
-            success: function(response){
+        let fullName = $('#full_name').val();
+        let email   = $('#email').val();
+        let message = $('#message').val();
+        let post_id = $('#post_id').val();
 
-                console.log(response);
-            }
-        });
+        if(fullName === '' || email === '' || message === '' || cxc_individual_file == undefined ){
+            alert('Please fill in all the required fields and upload CV.');
+        }
+        else{
+            cxc_form.append('full_name', fullName);
+            cxc_form.append('email', email);
+            cxc_form.append('message', message);
+            cxc_form.append('post_id', post_id);
+            cxc_form.append("file", cxc_individual_file);
+            cxc_form.append('action', 'cxc_upload_file_data');
+
+            $.ajax({
+                type: 'POST',
+                url: ERPJOB.ajax_url,
+                data: cxc_form,
+                contentType: false,
+                processData: false,
+                success: function( cxc_response ){
+
+                    if( cxc_response != '' && cxc_response.success ){
+                        $('.cxc_upload_form')[0].reset();
+                        alert('successfully uploaded an image');
+                    }
+                    else{
+                        alert('CV not uploaded');
+                    }
+                    
+                }
+            });
+        }
     });
-
 });
 
 

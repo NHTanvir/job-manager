@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php do_action( 'job_application_start', $apply ); ?>
 		<?php if( is_user_logged_in() ) : ?>
 	    <div class="erp-job-container">
-	        <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data">
+	        <form method="post" class="cxc_upload_form" enctype="multipart/form-data">
 	            <label for="full_name">Full Name:</label>
 	            <input type="text" id="full_name" name="full_name" required>
 
@@ -32,8 +32,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	            <label for="message">Message:</label>
 	            <textarea id="message" name="message" required></textarea>
 
-	            <label for="cv">Upload CV:</label>
-	            <input type="file" id="cv" name = "files[]"  accept=".pdf, .doc, .docx">
+				<div class="cxc_image_url"></div>
+				<label for="cv">Upload CV:</label>
+				<input type="file" name="file"  accept=".pdf, .doc, .doc" required />
+				<input type="hidden" name="post_id" id="post_id" value="<?php echo get_the_id() ?>" />
 
 	            <input type="submit" value="Apply" class="btn erp-job-submit-btn">
 	        </form>

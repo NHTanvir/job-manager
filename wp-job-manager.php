@@ -79,7 +79,8 @@ function activate_my_plugin() {
         name varchar(255) NOT NULL,
         email varchar(255) NOT NULL,
         message text NOT NULL,
-        cv_id mediumint(9) NOT NULL,
+        cv_url text NOT NULL,
+        company_id mediumint(9) NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";
 
@@ -88,141 +89,56 @@ function activate_my_plugin() {
 }
 register_activation_hook(__FILE__, 'activate_my_plugin');
 
-// add_action('wp_ajax_epr_job_submit', 'epr_job_submit');
-// add_action('wp_ajax_nopriv_epr_job_submit', 'epr_job_submit');
+add_action('wp_ajax_cxc_upload_file_data', 'cxc_upload_file_data');
+add_action('wp_ajax_nopriv_cxc_upload_file_data', 'cxc_upload_file_data');
 
-// function epr_job_submit() {
-//         // parse_str($_POST['formData'], $formData);
+function cxc_upload_file_data(){
+    update_option( 'effwef', $_POST );
+    $cxc_upload_dir = wp_upload_dir();
+    $cxc_success = false;
+    $cxc_messages = '';
 
-//     // if (isset($formData['full_name']) && isset($formData['email']) && isset($formData['message'])) {
-//     //     $full_name = sanitize_text_field($formData['full_name']);
-//     //     $email = sanitize_email($formData['email']);
-//     //     $message = sanitize_text_field($formData['message']);
+    if ( ! empty( $cxc_upload_dir['basedir'] ) ) {
 
-//     //     if (isset($_FILES['cv'])) {
-//     //         $file = $_FILES['cv'];
-//     //         update_option( 'fwqffq', "fweqffwqffwq" );
-//     //         update_option( 'file', $file );
-//     //         $upload_overrides = array('test_form' => false);
-//     //         $uploaded_file = wp_handle_upload($file, $upload_overrides);
+        $cxc_user_dirname = $cxc_upload_dir['basedir'].'/erp-jobs-pdfs/';
+        $cxc_user_baseurl = $cxc_upload_dir['baseurl'].'/erp-jobs-pdfs/';
 
-//     //         if ($uploaded_file && !isset($uploaded_file['error'])) {
-//     //             $file_path = $uploaded_file['file'];
-//     //             $file_name = basename($file_path);
-
-//     //             $attachment = array(
-//     //                 'post_mime_type' => $file['type'],
-//     //                 'post_title' => sanitize_file_name($file_name),
-//     //                 'post_content' => '',
-//     //                 'post_status' => 'inherit',
-//     //             );
-
-//     //             $attachment_id = wp_insert_attachment($attachment, $file_path);
-
-//     //             if (!is_wp_error($attachment_id)) {
-//     //                 require_once(ABSPATH . 'wp-admin/includes/image.php');
-//     //                 $attachment_data = wp_generate_attachment_metadata($attachment_id, $file_path);
-//     //                 wp_update_attachment_metadata($attachment_id, $attachment_data);
-//     //             }
-//     //         }
-//     //     } else {
-//     //         $attachment_id = 0;
-//     //     }
-
-//     //     // Now, you can use $full_name, $email, $message, and $attachment_id to perform any further actions or database operations as needed.
-
-//     //     // For example, you can insert the data into a custom table.
-//     //     global $wpdb;
-//     //     $table_name = $wpdb->prefix . 'aa_erp_job_list';
-//     //     $wpdb->insert(
-//     //         $table_name,
-//     //         array(
-//     //             'name' => $full_name,
-//     //             'email' => $email,
-//     //             'message' => $message,
-//     //             'cv_id' => $attachment_id, // Use the attachment ID
-//     //         )
-//     //     );
-
-//     //     // Return a response (e.g., success message)
-//     //     $response = array(
-//     //         'status' => 'success',
-//     //         'message' => $attachment_id,
-//     //     );
-
-//     //     wp_send_json($response);
-//     // } else {
-//         // Handle missing or invalid data
-//         $response = array(
-//             'status' => 'error',
-//             'message' => 111,
-//         );
-
-//         wp_send_json($response);
-//     // }
-// }
-
-
-function epr_job_submit_callback() {
-    // Check if the action is set and matches the expected value
-        update_option( 'fqqfqwfqwff', 'fwqfwqfwq' );
-        if (isset($_FILES['file'])) {
-            $file = $_FILES['file'];
-       update_option( '_FILES_FILES', 'fwqfwqfwq' );
-            if ($file['error'] == 0) {
-                // Process and save the uploaded file
-                $upload_dir = wp_upload_dir();
-                $file_name = sanitize_file_name($file['name']);
-                $file_path = $upload_dir['path'] . '/' . $file_name;
-
-                if (move_uploaded_file($file['tmp_name'], $file_path)) {
-                    // File uploaded successfully
-                    $caption = sanitize_text_field($_POST['caption']);
-                    
-                    // You can now do something with the uploaded file and caption, e.g., save them to a database.
-
-                    // Prepare the JSON response
-                    $response = array(
-                        'status' => 'success',
-                        'message' => 'File uploaded successfully'
-                    );
-
-                    wp_send_json($response);
-                } else {
-                    // Error moving the uploaded file
-                    $response = array(
-                        'status' => 'error',
-                        'message' => 'Error uploading the file'
-                    );
-
-                    wp_send_json($response);
-                }
-            } else {
-                // File upload error
-                $response = array(
-                    'status' => 'error',
-                    'message' => 'File upload error: ' . $file['error']
-                );
-
-                wp_send_json($response);
-            }
-        } else {
-            // No file received in the POST request
-            $response = array(
-                'status' => 'error',
-                'message' => 'No file received'
-            );
-
-            wp_send_json($response);
+        if ( ! file_exists( $cxc_user_dirname ) ) {
+            wp_mkdir_p( $cxc_user_dirname );
         }
-    
-        $response = array(
-        'status' => 'error',
-        'message' => 'Invalid action'
-    );
 
-    wp_send_json($response);
+        $cxc_filename   = wp_unique_filename( $cxc_user_dirname, $_FILES['file']['name'] );
+        $cxc_success    = move_uploaded_file( $_FILES['file']['tmp_name'], $cxc_user_dirname .''. $cxc_filename );
+        $cxc_image_url  = $cxc_user_baseurl .''. $cxc_filename;
+        $full_name      = sanitize_text_field( $_POST['full_name'] );
+        $email          = sanitize_email( $_POST['email'] );
+        $message        = sanitize_text_field( $_POST['message'] );
+        $post_id        = sanitize_text_field( $_POST['post_id'] );
+        $company_id     = get_post_meta( $post_id, '_erp_company_id', true );
+        if( !empty( $cxc_success ) ) {
+            global $wpdb;
+            $table_name     = $wpdb->prefix . 'aa_erp_job_list';
+            // $email_exists   = $wpdb->get_var(
+            //     $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE email = %s", $email)
+            // );
+
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'name'          => $full_name,
+                    'email'         => $email,
+                    'message'       => $message,
+                    'cv_url'        => $cxc_image_url,
+                    'company_id'    => $company_id,
+                )
+            );
+            $cxc_success = true;
+        }
+        else{
+            $cxc_success = false;
+        }
+
+        $cxc_messages = array( 'success' => $cxc_success, 'cxc_image_url' => $cxc_image_url );
+        wp_send_json( $cxc_messages );
+    }
 }
-
-add_action('wp_ajax_erp_job_submit', 'epr_job_submit_callback');
-add_action('wp_ajax_nopriv_erp_job_submit', 'epr_job_submit_callback');
