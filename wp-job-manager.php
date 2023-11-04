@@ -82,6 +82,7 @@ function activate_my_plugin() {
         cv_url text NOT NULL,
         company_id mediumint(9) NOT NULL,
         contract_id mediumint(9) NOT NULL,
+        status text NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";
 
@@ -94,7 +95,7 @@ add_action('wp_ajax_cxc_upload_file_data', 'cxc_upload_file_data');
 add_action('wp_ajax_nopriv_cxc_upload_file_data', 'cxc_upload_file_data');
 
 function cxc_upload_file_data(){
-    update_option( 'effwef', $_POST );
+
     $cxc_upload_dir = wp_upload_dir();
     $cxc_success = false;
     $cxc_messages = '';
@@ -143,7 +144,8 @@ function cxc_upload_file_data(){
                     'message'       => $message,
                     'cv_url'        => $cxc_image_url,
                     'company_id'    => $company_id,
-                    'contract_id'    => $contact_id,
+                    'contract_id'   => $contact_id,
+                    'status'        => 'applied',
                 )
             );
             $admin_email    = get_option('admin_email');
@@ -162,3 +164,36 @@ function cxc_upload_file_data(){
         wp_send_json( $cxc_messages );
     }
 }
+
+function job_applications_table_shortcode() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'aa_erp_job_list';
+
+    $job_applications = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
+    
+    // Start building the table HTML
+    $table_html = '<table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Message</th>
+            <th>CV</th>
+            <th>Status</th>
+        </tr>';
+    
+    // Loop through the fetched data and create table rows
+    foreach ($job_applications as $application) {
+        $table_html .= '<tr>
+            <td>' . $application['name'] . '</td>
+            <td>' . $application['email'] . '</td>
+            <td>' . $application['message'] . '</td>
+            <td><a href="' . $application['cv_url'] . '" target="_blank">Download CV</a></td>
+            <td>' . $application['status']. '</td>
+        </tr>';
+    }
+    
+    $table_html .= '</table>';
+    
+    return $table_html;
+}
+add_shortcode('job_applications_table', 'job_applications_table_shortcode');
