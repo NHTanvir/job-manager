@@ -171,6 +171,7 @@ function job_applications_table_shortcode() {
     $current_user_id    = get_current_user_id();
     $table_name         = $wpdb->prefix . 'erp_peoples';
     $company_id         = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $table_name WHERE user_id = %d", $current_user_id) );
+    $status_options     = ['applied', 'hired', 'closed'];
 
     if ( ! $company_id ) return;
 
@@ -181,20 +182,24 @@ function job_applications_table_shortcode() {
         ARRAY_A
     );
 
+    if ( $job_applications ) {
+        $table_html = '<table>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Message</th>
+                <th>CV</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>';
+    }
+    else{
+        echo 'No one has applied or you don’t have permission';
+    }
+
     if ( ! $job_applications ) return;
 
-    // Start building the table HTML
-    $table_html = '<table>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Message</th>
-            <th>CV</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>';
 
-    $status_options = ['applied', 'hired', 'closed'];
 
     foreach ( $job_applications as $application ) {
         if ( $application['status'] != 'applied' ) {
