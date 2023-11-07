@@ -42,6 +42,26 @@ jQuery(document).ready(function ($) {
             });
         }
     });
+
+    $('#erp-job-status').on('click', function() {
+        var selectedStatus  = $('select[name="status"]').val();
+        var email           = $('td:nth-child(2)').text(); // Assuming email is in the second column
+
+        // Make the AJAX request
+        $.ajax({
+            url: ERPJOB.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'update_status',
+                status: selectedStatus,
+                email: email
+            },
+            success: function(response) {
+
+                console.log(response);
+            }
+        });
+    });
 });
 
 

@@ -179,6 +179,7 @@ function job_applications_table_shortcode() {
             <th>Message</th>
             <th>CV</th>
             <th>Status</th>
+            <th>Action</th>
         </tr>';
 
     $status_options = ['applied', 'hired', 'rejected'];
@@ -203,6 +204,9 @@ function job_applications_table_shortcode() {
             $table_html .= '
                     </select>
                 </td>
+                <td>
+                    <button id="erp-job-status update" >Apply</button>
+                </td>
             </tr>';
         }
 
@@ -213,3 +217,19 @@ function job_applications_table_shortcode() {
     return $table_html;
 }
 add_shortcode('job_applications_table', 'job_applications_table_shortcode');
+function update_status_callback() {
+    // Get the status and email from the AJAX request
+    $status = sanitize_text_field($_POST['status']);
+    $email = sanitize_email($_POST['email']);
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'aa_erp_job_list';  // Replace 'your_table_name' with the actual table name
+
+    $sql = $wpdb->prepare("UPDATE $table_name SET status = %s WHERE email = %s", $status, $email );
+
+    $wpdb->query($sql);
+
+    wp_die();
+}
+
+add_action('wp_ajax_update_status', 'update_status_callback');
+add_action('wp_ajax_nopriv_update_status', 'update_status_callback');
