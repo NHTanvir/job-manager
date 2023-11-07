@@ -166,11 +166,23 @@ function cxc_upload_file_data(){
 }
 
 function job_applications_table_shortcode() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'aa_erp_job_list';
 
-    $job_applications = $wpdb->get_results("SELECT * FROM $table_name", ARRAY_A);
-    
+    global $wpdb;
+    $current_user_id    = get_current_user_id();
+    $table_name         = $wpdb->prefix . 'erp_peoples';
+    $company_id         = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $table_name WHERE user_id = %d", $current_user_id) );
+
+    if ( ! $company_id ) return;
+
+    $table_name2 = $wpdb->prefix . 'aa_erp_job_list';
+
+    $job_applications = $wpdb->get_results(
+        $wpdb->prepare("SELECT * FROM $table_name2 WHERE company_id = %d", $company_id ),
+        ARRAY_A
+    );
+
+    if ( ! $job_applications ) return;
+
     // Start building the table HTML
     $table_html = '<table>
         <tr>
@@ -182,10 +194,9 @@ function job_applications_table_shortcode() {
             <th>Action</th>
         </tr>';
 
-    $status_options = ['applied', 'hired', 'rejected'];
-    // Loop through the fetched data and create table rows
+    $status_options = ['applied', 'hired', 'closed'];
+
     foreach ( $job_applications as $application ) {
-        
         if ( $application['status'] != 'applied' ) {
             $table_html .= '<tr>
                 <td>' . $application['name'] . '</td>
@@ -196,18 +207,18 @@ function job_applications_table_shortcode() {
                     <select name="status">
                         ';
 
-            foreach ($status_options as $option) {
-                $selected = ($option == $application['status']) ? 'selected' : '';
-                $table_html .= '<option value="' . $option . '" ' . $selected . '>' . ucfirst( $option ). '</option>';
-            }
+                foreach ( $status_options as $option ) {
+                    $selected = ($option == $application['status']) ? 'selected' : '';
+                    $table_html .= '<option value="' . $option . '" ' . $selected . '>' . ucfirst( $option ). '</option>';
+                }
 
-            $table_html .= '
-                    </select>
-                </td>
-                <td>
-                    <button id="erp-job-status update" >Apply</button>
-                </td>
-            </tr>';
+                $table_html .= '
+                        </select>
+                    </td>
+                    <td>
+                        <button id="erp-job-status" >Apply</button>
+                    </td>
+                </tr>';
         }
 
     }
