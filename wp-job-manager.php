@@ -180,16 +180,32 @@ function job_applications_table_shortcode() {
             <th>CV</th>
             <th>Status</th>
         </tr>';
-    
+
+    $status_options = ['applied', 'hired', 'rejected'];
     // Loop through the fetched data and create table rows
-    foreach ($job_applications as $application) {
-        $table_html .= '<tr>
-            <td>' . $application['name'] . '</td>
-            <td>' . $application['email'] . '</td>
-            <td>' . $application['message'] . '</td>
-            <td><a href="' . $application['cv_url'] . '" target="_blank">Download CV</a></td>
-            <td>' . $application['status']. '</td>
-        </tr>';
+    foreach ( $job_applications as $application ) {
+        
+        if ( $application['status'] != 'applied' ) {
+            $table_html .= '<tr>
+                <td>' . $application['name'] . '</td>
+                <td>' . $application['email'] . '</td>
+                <td>' . $application['message'] . '</td>
+                <td><a href="' . $application['cv_url'] . '" target="_blank">Download CV</a></td>
+                <td>
+                    <select name="status">
+                        ';
+
+            foreach ($status_options as $option) {
+                $selected = ($option == $application['status']) ? 'selected' : '';
+                $table_html .= '<option value="' . $option . '" ' . $selected . '>' . ucfirst( $option ). '</option>';
+            }
+
+            $table_html .= '
+                    </select>
+                </td>
+            </tr>';
+        }
+
     }
     
     $table_html .= '</table>';
