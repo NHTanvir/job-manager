@@ -16,11 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <?php if ( $apply = get_the_job_application_method() ) :
-	wp_enqueue_script( 'wp-job-manager-job-application' );
 	?>
 	<div class="job_application application">
 		<?php do_action( 'job_application_start', $apply ); ?>
-		<?php if( is_user_logged_in() ) : ?>
+
 	    <div class="erp-job-container">
 	        <form method="post" class="cxc_upload_form" enctype="multipart/form-data">
 	            <label for="full_name">Full Name:</label>
@@ -40,9 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	            <input type="submit" value="Apply" class="btn erp-job-submit-btn">
 	        </form>
 	    </div>
-	    <?php else: ?>
-	    <?php _e( 'Log In to apply', 'wp-job-manager' ) ?>
-	    <?php endif; ?>
+
 		<?php do_action( 'job_application_end', $apply ); ?>
 	</div>
 <?php endif; ?>

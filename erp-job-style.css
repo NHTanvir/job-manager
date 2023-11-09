@@ -42,3 +42,41 @@
 .erp-job-container .btn:hover {
     background-color: #0056b3;
 }
+
+/* The Modal (background) */
+.erp-job-modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%; 
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.erp-job-modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    margin-top: 200px;
+    height: 80px;
+}
+
+.erp-job-modal-close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.erp-job-modal-close:hover,
+.erp-job-modal-close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}

@@ -96,9 +96,28 @@ add_action('wp_ajax_nopriv_cxc_upload_file_data', 'cxc_upload_file_data');
 
 function cxc_upload_file_data(){
 
+    global $wpdb;
+    $table_name     = $wpdb->prefix . 'aa_erp_job_list';
+    $full_name      = sanitize_text_field( $_POST['full_name'] );
+    $email          = sanitize_email( $_POST['email'] );
+    $message        = sanitize_text_field( $_POST['message'] );
+    $post_id        = sanitize_text_field( $_POST['post_id'] );
+    $company_id     = get_post_meta( $post_id, '_erp_company_id', true );
+    $contact_id     = 0;
     $cxc_upload_dir = wp_upload_dir();
-    $cxc_success = false;
-    $cxc_messages = '';
+    $cxc_success    = false;
+    $cxc_messages   = '';
+    $applied        = $wpdb->get_var( 
+        $wpdb->prepare( 
+            "SELECT COUNT(*) FROM $table_name WHERE email = %s AND company_id = %s", $email, $company_id  ) );
+    if ( $applied ) {
+        $cxc_messages = array( 
+            'success' => $cxc_success,
+            'message' => 'You have already applied'
+        );
+        wp_send_json( $cxc_messages );
+    }
+
 
     if ( ! empty( $cxc_upload_dir['basedir'] ) ) {
 
@@ -112,19 +131,9 @@ function cxc_upload_file_data(){
         $cxc_filename   = wp_unique_filename( $cxc_user_dirname, $_FILES['file']['name'] );
         $cxc_success    = move_uploaded_file( $_FILES['file']['tmp_name'], $cxc_user_dirname .''. $cxc_filename );
         $cxc_image_url  = $cxc_user_baseurl .''. $cxc_filename;
-        $full_name      = sanitize_text_field( $_POST['full_name'] );
-        $email          = sanitize_email( $_POST['email'] );
-        $message        = sanitize_text_field( $_POST['message'] );
-        $post_id        = sanitize_text_field( $_POST['post_id'] );
-        $company_id     = get_post_meta( $post_id, '_erp_company_id', true );
-        $contact_id     = 0;
+
 
         if( !empty( $cxc_success ) ) {
-            global $wpdb;
-            $table_name     = $wpdb->prefix . 'aa_erp_job_list';
-            // $email_exists   = $wpdb->get_var(
-            //     $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE email = %s", $email)
-            // );
 
             $data = [
                 'type'          => 'contact',
@@ -155,13 +164,21 @@ function cxc_upload_file_data(){
             wp_mail( $admin_email, $subject, $message );
 
             $cxc_success = true;
+            $cxc_messages = array( 
+                'success' => $cxc_success,
+                'message' => 'Successfully Applied'
+            );
         }
         else{
             $cxc_success = false;
+            $cxc_messages = array( 
+                'success' => $cxc_success,
+                'message' => 'Apply Failed'
+            );
         }
 
-        $cxc_messages = array( 'success' => $cxc_success, 'cxc_image_url' => $cxc_image_url );
         wp_send_json( $cxc_messages );
+
     }
 }
 
@@ -171,7 +188,7 @@ function job_applications_table_shortcode() {
     $current_user_id    = get_current_user_id();
     $table_name         = $wpdb->prefix . 'erp_peoples';
     $company_id         = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $table_name WHERE user_id = %d", $current_user_id) );
-    $status_options     = ['applied', 'hired', 'closed'];
+    $status_options     = ['applied', 'hired', 'closed' ,'interview', 'interviewed' ];
 
     if ( ! $company_id ) return;
 
@@ -244,8 +261,31 @@ function update_status_callback() {
 
     $wpdb->query($sql);
 
+    $table_name = $wpdb->prefix . 'erp_peoples';
+
+    $wpdb->update(
+        $table_name,
+        array('life_stage' => $status ),
+        array('email' => $email ),
+        array('%s'), // Format for life_stage
+        array('%s') // Format for email
+    );
+
     wp_die();
 }
 
 add_action('wp_ajax_update_status', 'update_status_callback');
 add_action('wp_ajax_nopriv_update_status', 'update_status_callback');
+
+add_action( 'wp_footer', 'modal' );
+
+function modal() {
+    ?>
+    <div class="erp-job-modal">
+      <div class="erp-job-modal-content">
+        <span class="erp-job-modal-close">&times;</span>
+        <p></p>
+      </div>
+    </div>
+    <?php
+}
