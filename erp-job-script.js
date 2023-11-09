@@ -45,8 +45,9 @@ jQuery(document).ready(function ($) {
     });
 
     $(document).on('click', '#erp-job-status', function(e){
-        var selectedStatus  = $('select[name="status"]').val();
-        var email           = $('td:nth-child(2)').text(); // Assuming email is in the second column
+        e.preventDefault();
+        var selectedStatus  = $(this).closest('tr').find('select[name="status"]').val();
+        var email           = $(this).closest('tr').find('td:nth-child(2)').text();
 
         $.ajax({
             url: ERPJOB.ajax_url,
@@ -57,7 +58,8 @@ jQuery(document).ready(function ($) {
                 email: email
             },
             success: function(response) {
-                console.log(response);
+                $('.erp-job-modal p').text(response.message);
+                $('.erp-job-modal').show();
             }
         });
     });

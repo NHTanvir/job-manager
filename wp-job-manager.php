@@ -57,17 +57,12 @@ register_deactivation_hook( __FILE__, [ WPJM(), 'usage_tracking_cleanup' ] );
 
 // Enqueue the JavaScript file
 function enqueue_plugin_script() {
-        wp_enqueue_style('erp-job-style', plugin_dir_url(__FILE__) . 'erp-job-style.css', array(), '1.0.0', 'all');
+    wp_enqueue_style('erp-job-style', plugin_dir_url(__FILE__) . 'erp-job-style.css', array(), '1.0.0', 'all');
     wp_enqueue_script('erp-job-script', plugin_dir_url(__FILE__) . 'erp-job-script.js', array('jquery'), '1.0.0', true);
     wp_localize_script('erp-job-script', 'ERPJOB', array('ajax_url' => admin_url('admin-ajax.php')));
 }
 add_action('wp_enqueue_scripts', 'enqueue_plugin_script');
 
-add_action('wp_head', 'css' );
-
-function css() {
-
-}
 function activate_my_plugin() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'aa_erp_job_list';
@@ -252,12 +247,12 @@ function job_applications_table_shortcode() {
 add_shortcode('job_applications_table', 'job_applications_table_shortcode');
 function update_status_callback() {
     // Get the status and email from the AJAX request
-    $status = sanitize_text_field($_POST['status']);
-    $email = sanitize_email($_POST['email']);
+    $status     = sanitize_text_field($_POST['status']);
+    $email      = sanitize_email($_POST['email']);
     global $wpdb;
     $table_name = $wpdb->prefix . 'aa_erp_job_list';  // Replace 'your_table_name' with the actual table name
 
-    $sql = $wpdb->prepare("UPDATE $table_name SET status = %s WHERE email = %s", $status, $email );
+    $sql        = $wpdb->prepare("UPDATE $table_name SET status = %s WHERE email = %s", $status, $email );
 
     $wpdb->query($sql);
 
@@ -267,11 +262,19 @@ function update_status_callback() {
         $table_name,
         array('life_stage' => $status ),
         array('email' => $email ),
-        array('%s'), // Format for life_stage
-        array('%s') // Format for email
+        array('%s'), 
+        array('%s') 
     );
 
-    wp_die();
+    $cxc_success = true;
+    $cxc_messages = array( 
+        'success' => $cxc_success,
+        'message' => 'Status chaged to '. $status .''
+    );
+
+
+    wp_send_json( $cxc_messages );
+
 }
 
 add_action('wp_ajax_update_status', 'update_status_callback');
