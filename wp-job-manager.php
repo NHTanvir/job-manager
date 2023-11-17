@@ -62,6 +62,7 @@ function enqueue_plugin_script() {
     wp_localize_script('erp-job-script', 'ERPJOB', array('ajax_url' => admin_url('admin-ajax.php')));
 }
 add_action('wp_enqueue_scripts', 'enqueue_plugin_script');
+add_action('admin_enqueue_scripts', 'enqueue_plugin_script');
 
 function activate_my_plugin() {
     global $wpdb;
@@ -77,6 +78,7 @@ function activate_my_plugin() {
         cv_url text NOT NULL,
         company_id mediumint(9) NOT NULL,
         contract_id mediumint(9) NOT NULL,
+        job_id mediumint(9) NOT NULL,
         status text NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";
@@ -134,7 +136,6 @@ function cxc_upload_file_data(){
                 'type'          => 'contact',
                 'first_name'    => $full_name,
                 'email'         => $email,
-                'life_stage'    => 'applied',
             ];
             if ( function_exists('erp_insert_people') ) {
                 $contact_id = erp_insert_people( $data );
@@ -149,6 +150,7 @@ function cxc_upload_file_data(){
                     'cv_url'        => $cxc_image_url,
                     'company_id'    => $company_id,
                     'contract_id'   => $contact_id,
+                    'job_id'        => $post_id,
                     'status'        => 'applied',
                 )
             );
@@ -216,7 +218,7 @@ function job_applications_table_shortcode() {
     foreach ( $job_applications as $application ) {
         if ( $application['status'] != 'applied' ) {
             $table_html .= '<tr>
-                <td>' . $application['name'] . '</td>
+                <td data-id="'. $application['id'] .'" >' . $application['name'] . '</td>
                 <td>' . $application['email'] . '</td>
                 <td>' . $application['message'] . '</td>
                 <td><a href="' . $application['cv_url'] . '" target="_blank">Download CV</a></td>
@@ -247,31 +249,20 @@ function job_applications_table_shortcode() {
 add_shortcode('job_applications_table', 'job_applications_table_shortcode');
 function update_status_callback() {
     // Get the status and email from the AJAX request
-    $status     = sanitize_text_field($_POST['status']);
-    $email      = sanitize_email($_POST['email']);
+    $status     = sanitize_text_field( $_POST['status'] );
+    $id         = sanitize_text_field( $_POST['id'] );
     global $wpdb;
-    $table_name = $wpdb->prefix . 'aa_erp_job_list';  // Replace 'your_table_name' with the actual table name
+    $table_name = $wpdb->prefix . 'aa_erp_job_list';
 
-    $sql        = $wpdb->prepare("UPDATE $table_name SET status = %s WHERE email = %s", $status, $email );
+    $sql        = $wpdb->prepare("UPDATE $table_name SET status = %s WHERE id = %s", $status, $id );
 
     $wpdb->query($sql);
-
-    $table_name = $wpdb->prefix . 'erp_peoples';
-
-    $wpdb->update(
-        $table_name,
-        array('life_stage' => $status ),
-        array('email' => $email ),
-        array('%s'), 
-        array('%s') 
-    );
 
     $cxc_success = true;
     $cxc_messages = array( 
         'success' => $cxc_success,
         'message' => 'Status chaged to '. $status .''
     );
-
 
     wp_send_json( $cxc_messages );
 
@@ -281,6 +272,7 @@ add_action('wp_ajax_update_status', 'update_status_callback');
 add_action('wp_ajax_nopriv_update_status', 'update_status_callback');
 
 add_action( 'wp_footer', 'modal' );
+add_action( 'admin_footer', 'modal' );
 
 function modal() {
     ?>

@@ -47,7 +47,7 @@ jQuery(document).ready(function ($) {
     $(document).on('click', '#erp-job-status', function(e){
         e.preventDefault();
         var selectedStatus  = $(this).closest('tr').find('select[name="status"]').val();
-        var email           = $(this).closest('tr').find('td:nth-child(2)').text();
+        var id              = $(this).closest('tr').find('td:nth-child(1)').data('id');
 
         $.ajax({
             url: ERPJOB.ajax_url,
@@ -55,7 +55,7 @@ jQuery(document).ready(function ($) {
             data: {
                 action: 'update_status',
                 status: selectedStatus,
-                email: email
+                id: id
             },
             success: function(response) {
                 $('.erp-job-modal p').text(response.message);
