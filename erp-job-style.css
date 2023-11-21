@@ -92,9 +92,9 @@
 }
 .erp-job-wrapper h4{
     margin: unset;
-    margin-bottom: 20px;
     text-align: center;
     font-size: 24px;
+    margin: 30px 0px;
 }
 
 .erp-job-wrapper table {
