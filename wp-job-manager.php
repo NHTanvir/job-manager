@@ -110,7 +110,7 @@ function cxc_upload_file_data(){
     if ( $applied ) {
         $cxc_messages = array( 
             'success' => $cxc_success,
-            'message' => 'You have already applied'
+            'message' => __('You have already applied', 'wp-job-manager' )
         );
         wp_send_json( $cxc_messages );
     }
@@ -163,14 +163,15 @@ function cxc_upload_file_data(){
             $cxc_success = true;
             $cxc_messages = array( 
                 'success' => $cxc_success,
-                'message' => 'Successfully Applied'
+                'message' => __( 'Successfully Applied', 'wp-job-manager' )
+
             );
         }
         else{
             $cxc_success = false;
             $cxc_messages = array( 
                 'success' => $cxc_success,
-                'message' => 'Apply Failed'
+                'message' => __( 'Apply Failed', 'wp-job-manager' )
             );
         }
 
@@ -199,16 +200,16 @@ function job_applications_table_shortcode() {
     if ( $job_applications ) {
         $table_html = '<table>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Message</th>
-                <th>CV</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>'. __( "Name", "wp-job-manager" ) .'</th>
+                <th>'. __( "Email", "wp-job-manager" ) .'</th>
+                <th>'. __( "Message", "wp-job-manager" ) .'</th>
+                <th>'. __( "CV", "wp-job-manager" ) .'</th>
+                <th>'. __( "Status", "wp-job-manager" ) .'</th>
+                <th>'. __( "Action", "wp-job-manager" ) .'</th>
             </tr>';
     }
     else{
-        echo 'No one has applied or you don’t have permission';
+       _e('No one has applied or you don’t have permission.', 'wp-job-manager');
     }
 
     if ( ! $job_applications ) return;
@@ -221,7 +222,7 @@ function job_applications_table_shortcode() {
                 <td data-id="'. $application['id'] .'" >' . $application['name'] . '</td>
                 <td>' . $application['email'] . '</td>
                 <td>' . $application['message'] . '</td>
-                <td><a href="' . $application['cv_url'] . '" target="_blank">Download CV</a></td>
+                <td><a href="' . $application['cv_url'] . '" target="_blank">'. __( "Download CV", "wp-job-manager" ) .'</a></td>
                 <td>
                     <select name="status">
                         ';
@@ -235,7 +236,7 @@ function job_applications_table_shortcode() {
                         </select>
                     </td>
                     <td>
-                        <button id="erp-job-status" >Apply</button>
+                        <button id="erp-job-status" >'. __( "Apply", "wp-job-manager" ) .'</button>
                     </td>
                 </tr>';
         }
@@ -261,7 +262,7 @@ function update_status_callback() {
     $cxc_success = true;
     $cxc_messages = array( 
         'success' => $cxc_success,
-        'message' => 'Status chaged to '. $status .''
+        'message' => __('Status changed to ', 'wp-job-manager') . $status,
     );
 
     wp_send_json( $cxc_messages );
@@ -284,3 +285,12 @@ function modal() {
     </div>
     <?php
 }
+function custom_redirect_for_user_role( $user_login, $user ) {
+
+    if (in_array('employer', $user->roles)) {
+        $redirect_url = get_permalink(8379);
+        wp_redirect($redirect_url);
+        exit();
+    }
+}
+add_action('wp_login', 'custom_redirect_for_user_role', 10, 2);

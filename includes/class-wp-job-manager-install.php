@@ -187,6 +187,9 @@ class WP_Job_Manager_Install {
 				'Internship' => [
 					'employment_type' => 'INTERN',
 				],
+				'Manager' => [
+					'employment_type' => 'MANAGER',
+				],
 			],
 		];
 	}
