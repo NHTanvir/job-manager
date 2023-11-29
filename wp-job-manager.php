@@ -294,3 +294,95 @@ function custom_redirect_for_user_role( $user_login, $user ) {
     }
 }
 add_action('wp_login', 'custom_redirect_for_user_role', 10, 2);
+
+function custom_shortcode_function() {
+
+
+
+    $category_slugs = array('eeee', 'www', );
+
+    $args_posts = array(
+        'post_type' => 'post',
+        'category_name' => implode(',', $category_slugs ), 
+        'posts_per_page' => -1,
+    );
+
+    $posts_query = new WP_Query($args_posts);
+
+    $args = array(
+        'post_type' => 'job_listing',
+        'posts_per_page' => -1,
+    );
+    
+    $jobs_query = new WP_Query($args);
+    $combined_posts = array_merge($posts_query->posts, $jobs_query->posts);
+
+// Shuffle the combined array to get a random order
+    shuffle($combined_posts);
+
+    // Custom array to store post data
+    $custom_posts = array();
+    foreach ($combined_posts as $post) {
+        setup_postdata($post);
+    
+        if ($post->post_type === 'post') {
+            $terms = get_the_category($post->ID);
+            $category_name = !empty($terms) ? $terms[0]->name : '';
+        } elseif ($post->post_type === 'job_listing') {
+            $taxonomy = 'job_listing_type'; // Replace 'job_listing_type' with the actual taxonomy name
+            $terms = get_the_terms($post->ID, $taxonomy);
+            $category_name = !empty($terms) ? $terms[0]->name : '';
+        }
+
+        
+        $custom_post = array(
+            'id' => get_the_ID(),
+            'post_content' => get_the_content(),
+            'category_name' => $category_name, // Assuming the post has only one category
+        );
+    
+
+        $custom_posts[] = $custom_post;
+    }
+    
+
+    $output = '<div class="erp-all-jobs" >';
+    
+        // Assuming you already have the $custom_posts array
+
+        foreach ($custom_posts as $custom_post) {
+            // Get post content from the custom array
+            $post_content = $custom_post['post_content'];
+
+            $output .= '<div class="job-listing">';
+
+            // Display post content
+            $output .= '<div class="post-content">' . wp_kses_post(substr($post_content, 0, 100)) . '...</div>';
+
+            // Get associated taxonomy terms from the custom array
+            $terms = isset($custom_post['category_name']) ? [$custom_post['category_name']] : null;
+
+            if ($terms && !is_wp_error($terms)) {
+                $output .= '<div class="taxonomy-terms">';
+
+                foreach ($terms as $term) {
+                    $output .= '<span class="term">' . esc_html($term) . '</span>';
+                }
+
+                $output .= '</div>';
+            }
+
+            // Add a button with the post link
+            $output .= '<a href="' . esc_url(get_permalink($custom_post['id'])) . '" class="button">' . esc_html('Apply Now', 'wp-job-manager') . '</a>';
+
+            $output .= '</div>';
+        }
+
+    $output .= '</div>';
+            
+    
+
+    return $output;
+}
+
+add_shortcode('erp_jobs', 'custom_shortcode_function');

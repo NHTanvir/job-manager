@@ -120,3 +120,34 @@
   color: white;
 }
 
+
+
+
+
+
+
+
+
+.erp-all-jobs{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+.erp-all-jobs .job-listing{
+    width: 30%;
+    height: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+    background-color: #eee;
+    padding: 20px;
+}
+.erp-all-jobs .job-listing a{
+    width: 150px;
+    text-decoration: unset;
+    padding: 15px 20px;
+    text-align: center;
+}
+
+
