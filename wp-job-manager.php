@@ -299,7 +299,7 @@ function custom_shortcode_function() {
 
 
 
-    $category_slugs = array('eeee', 'www', );
+    $category_slugs = array('Management', 'Inactive Ads' );
 
     $args_posts = array(
         'post_type' => 'post',
@@ -336,8 +336,8 @@ function custom_shortcode_function() {
 
         
         $custom_post = array(
-            'id' => get_the_ID(),
-            'post_content' => get_the_content(),
+            'id' => $post->ID,
+            'post_content' => get_the_title( $post->ID ),
             'category_name' => $category_name, // Assuming the post has only one category
         );
     
@@ -357,7 +357,7 @@ function custom_shortcode_function() {
             $output .= '<div class="job-listing">';
 
             // Display post content
-            $output .= '<div class="post-content">' . wp_kses_post(substr($post_content, 0, 100)) . '...</div>';
+            $output .= '<div class="post-content">' . substr($post_content, 0, 100) . '...</div>';
 
             // Get associated taxonomy terms from the custom array
             $terms = isset($custom_post['category_name']) ? [$custom_post['category_name']] : null;
@@ -373,7 +373,7 @@ function custom_shortcode_function() {
             }
 
             // Add a button with the post link
-            $output .= '<a href="' . esc_url(get_permalink($custom_post['id'])) . '" class="button">' . esc_html('Apply Now', 'wp-job-manager') . '</a>';
+            $output .= '<a href="' .get_permalink($custom_post['id']) . '" class="button">' . esc_html('Apply Now', 'wp-job-manager') . '</a>';
 
             $output .= '</div>';
         }
