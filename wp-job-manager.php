@@ -127,7 +127,6 @@ function cxc_upload_file_data(){
         $cxc_success    = move_uploaded_file( $_FILES['file']['tmp_name'], $cxc_user_dirname .''. $cxc_filename );
         $cxc_image_url  = $cxc_user_baseurl .''. $cxc_filename;
 
-
         if( !empty( $cxc_success ) ) {
 
             $data = [
