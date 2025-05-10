@@ -12,7 +12,6 @@
  * Text Domain: wp-job-manager
  * Domain Path: /languages/
  * License: GPL2+
- *
  * @package wp-job-manager
  */
 
