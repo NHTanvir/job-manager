@@ -112,8 +112,7 @@ function cxc_upload_file_data(){
         );
         wp_send_json( $cxc_messages );
     }
-
-
+	
     if ( ! empty( $cxc_upload_dir['basedir'] ) ) {
 
         $cxc_user_dirname = $cxc_upload_dir['basedir'].'/erp-jobs-pdfs/';
