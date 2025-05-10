@@ -53,7 +53,6 @@ register_activation_hook( basename( dirname( __FILE__ ) ) . '/' . basename( __FI
 register_deactivation_hook( __FILE__, [ WPJM(), 'unschedule_cron_jobs' ] );
 register_deactivation_hook( __FILE__, [ WPJM(), 'usage_tracking_cleanup' ] );
 
-
 // Enqueue the JavaScript file
 function enqueue_plugin_script() {
     wp_enqueue_style('erp-job-style', plugin_dir_url(__FILE__) . 'erp-job-style.css', array(), '1.0.0', 'all');
