@@ -170,9 +170,7 @@ function cxc_upload_file_data(){
                 'message' => __( 'Apply Failed', 'wp-job-manager' )
             );
         }
-
         wp_send_json( $cxc_messages );
-
     }
 }
 
@@ -183,12 +181,11 @@ function job_applications_table_shortcode() {
     $table_name         = $wpdb->prefix . 'erp_peoples';
     $company_id         = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $table_name WHERE user_id = %d", $current_user_id) );
     $status_options     = ['applied', 'hired', 'closed' ,'interview', 'interviewed' ];
+    $table_name2        = $wpdb->prefix . 'aa_erp_job_list';
 
     if ( ! $company_id ) return;
 
-    $table_name2 = $wpdb->prefix . 'aa_erp_job_list';
-
-    $job_applications = $wpdb->get_results(
+    $job_applications   = $wpdb->get_results(
         $wpdb->prepare("SELECT * FROM $table_name2 WHERE company_id = %d", $company_id ),
         ARRAY_A
     );
@@ -209,8 +206,6 @@ function job_applications_table_shortcode() {
     }
 
     if ( ! $job_applications ) return;
-
-
 
     foreach ( $job_applications as $application ) {
         if ( $application['status'] != 'applied' ) {
@@ -245,24 +240,22 @@ function job_applications_table_shortcode() {
 }
 add_shortcode('job_applications_table', 'job_applications_table_shortcode');
 function update_status_callback() {
-    // Get the status and email from the AJAX request
+    global $wpdb;
+
     $status     = sanitize_text_field( $_POST['status'] );
     $id         = sanitize_text_field( $_POST['id'] );
-    global $wpdb;
     $table_name = $wpdb->prefix . 'aa_erp_job_list';
-
     $sql        = $wpdb->prepare("UPDATE $table_name SET status = %s WHERE id = %s", $status, $id );
 
-    $wpdb->query($sql);
+    $wpdb->query( $sql );
 
-    $cxc_success = true;
-    $cxc_messages = array( 
+    $cxc_success    = true;
+    $cxc_messages   = array( 
         'success' => $cxc_success,
         'message' => __('Status changed to ', 'wp-job-manager') . $status,
     );
 
     wp_send_json( $cxc_messages );
-
 }
 
 add_action('wp_ajax_update_status', 'update_status_callback');
