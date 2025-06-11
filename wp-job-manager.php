@@ -341,32 +341,30 @@ function custom_shortcode_function() {
         $output .= '<div class="job-listing">';
 
         // Display post content
-        $output .= '<div class="post-content">' . substr($post_content, 0, 100) . '...</div>';
+        $output .= '<div class="post-content">' . substr( $post_content, 0, 100 ) . '...</div>';
 
         // Get associated taxonomy terms from the custom array
-        $terms = isset($custom_post['category_name']) ? [$custom_post['category_name']] : null;
+        $terms = isset( $custom_post['category_name'] ) ? [$custom_post['category_name']] : null;
 
-        if ($terms && !is_wp_error($terms)) {
+        if ( $terms && !is_wp_error( $terms ) ) {
             $output .= '<div class="taxonomy-terms">';
 
-            foreach ($terms as $term) {
-                $output .= '<span class="term">' . esc_html($term) . '</span>';
+            foreach ( $terms as $term ) {
+                $output .= '<span class="term">' . esc_html( $term ) . '</span>';
             }
 
             $output .= '</div>';
         }
 
         // Add a button with the post link
-        $output .= '<a href="' .get_permalink($custom_post['id']) . '" class="button">' . esc_html('Apply Now', 'wp-job-manager') . '</a>';
+        $output .= '<a href="' .get_permalink( $custom_post['id'] ) . '" class="button">' . esc_html('Apply Now', 'wp-job-manager') . '</a>';
 
         $output .= '</div>';
     }
 
     $output .= '</div>';
-            
-    
 
     return $output;
 }
 
-add_shortcode('erp_jobs', 'custom_shortcode_function');
+add_shortcode( 'erp_jobs', 'custom_shortcode_function' );
